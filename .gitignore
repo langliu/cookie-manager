@@ -6,6 +6,7 @@ node_modules
 # Production
 dist
 build
+.output
 
 # Testing
 coverage
