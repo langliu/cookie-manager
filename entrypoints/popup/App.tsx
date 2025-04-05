@@ -1,10 +1,33 @@
-import reactLogo from '@/assets/react.svg'
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
+import reactLogo from '~/assets/react.svg'
+import { sendMessage } from '~/lib/messaging'
 import wxtLogo from '/wxt.svg'
+import type { Browser } from '#imports'
 import './App.css'
 
 function App() {
   const [count, setCount] = useState(0)
+  const [cookies, setCookies] = useState<Browser.cookies.Cookie[]>([])
+
+  const handleClick = async () => {
+    setCount((count) => count + 1)
+    const [tab] = await browser.tabs.query({ active: true, currentWindow: true })
+    if (!tab?.id || !tab?.url) return
+    const url = new URL(tab.url)
+    console.log('url', url)
+    const domain = url.hostname
+    const cookies = await browser.cookies.getAll({
+      // domain,
+    })
+    console.log('cookies', cookies)
+    setCookies(cookies)
+    const response = await sendMessage('getStringLength', 'hello', tab.id)
+    console.log('popup', { response })
+  }
+
+  const cookieText = useMemo(() => {
+    return cookies.map((cookie) => `${cookie.name}=${cookie.value}`).join('; ')
+  }, [cookies])
 
   return (
     <>
@@ -16,16 +39,13 @@ function App() {
           <img src={reactLogo} className='logo react' alt='React logo' />
         </a>
       </div>
-      <h1>WXT + React</h1>
+      <h1>Cookie Manager</h1>
       <div className='card'>
-        <button onClick={() => setCount((count) => count + 1)} type='button'>
-          count is {count}
+        <button onClick={handleClick} type='button'>
+          获取Cookie
         </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
+        <p>{cookieText}</p>
       </div>
-      <p className='read-the-docs'>Click on the WXT and React logos to learn more</p>
     </>
   )
 }
