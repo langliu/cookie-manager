@@ -32,7 +32,7 @@ npm run zip
 
 ## 技术栈
 
-- WXT (Web Extension Tools)
+- [WXT](https://wxt.dev) (Web Extension Tools)
 - React
 - TypeScript
 - Biome (代码格式化工具)
